@@ -94,4 +94,4 @@ The activation shards are not included in this repository.
 - Reported results use multi-seed means. Individual notebook runs resample statements and random controls, so exact values can vary slightly with the seed, hardware, and library versions.
 - The conclusions should be evaluated from the qualitative and statistical pattern, not a single point estimate: weak probe-model overlap, shared > probe-only > random behavioral effects, and the dissociation between behavior change and probe-readout change.
 - The notebooks clone upstream repositories at runtime. Future upstream changes may affect reproducibility; record commit hashes when producing archival results.
-- Coherence gating is essential. A behavioral flip is interpretable only when the intervention preserves a valid output and does not merely degrade generation.
+- Coherence gating --> A behavioral flip is interpretable only when the intervention preserves a valid output and does not merely degrade generation.
