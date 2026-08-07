@@ -1,79 +1,25 @@
 # Decodability is Not Causality: Validating Behavioral Probes with SAE Decomposition
 
-[![COLM 2026](https://img.shields.io/badge/COLM-2026-6f42c1)](https://colmweb.org/)
-[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Open the main experiment in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/cam1lled/causal-validation-sae/blob/main/TTPD_probe_experiments.ipynb)
+Reproducibility code for **"Decodability is Not Causality: Validating Behavioral Probes with SAE Decomposition."**
 
-Official experiment code for the COLM 2026 paper **"Decodability is Not Causality: Validating Behavioral Probes with SAE Decomposition."**
+Accepted to the COLM 2026 AIMS Workshop, Actionable Interpretability Workshop, and Workshop on Agent Behavior.
 
 **Devesh Tiwari\*, Camille Davis\*, Shivank Sinha, Talia Weaver, Aditya Shah, and Maheep Chaudhary**<br>
 Algoverse AI Research<br>
 \*Equal contribution
 
-## Overview
+## TL;DR
 
-Linear probes can predict safety-relevant concepts from language-model activations, but strong probe performance establishes only that a concept is *decodable*. It does not show that the features weighted by the probe are the features that causally drive the model's behavior.
-
-We test that distinction at the level of sparse-autoencoder (SAE) features. Our primary case study applies the TTPD truth probe of [Buerger et al. (2024)](https://arxiv.org/abs/2407.12831) in the instructed truth/deception setting of [Long et al. (2025)](https://aclanthology.org/2025.emnlp-main.826/) using Gemma-2-9B-Instruct. We independently rank SAE features from two perspectives:
-
-1. **Probe alignment:** how strongly each SAE decoder direction aligns with the probe weight vector.
-2. **Model attribution:** how sensitive the model's `True`/`False` behavior is to each SAE feature, measured with gradients.
-3. **Causal intervention:** what happens to model behavior, probe readout, and output coherence when selected features are ablated.
-
-This separates features into three diagnostic groups:
-
-| Feature group | Probe-ranked | Model-ranked | Interpretation under intervention |
-|---|:---:|:---:|---|
-| Shared | Yes | Yes | Strongest candidates for behaviorally relevant features |
-| Probe-only | Yes | No | Candidate diagnostic readouts or correlates |
-| Random control | No | No | Matched baseline for nonspecific intervention effects |
-
-The central lesson is simple: **a probe's weight vector alone does not identify the features the model causally uses.** Probe attribution must be paired with model-side attribution, direct intervention, and a coherence check.
-
-## Main findings
-
-- **The replicated TTPD probe is highly predictive.** It reaches AUROC 0.98 on deceptive-instruction activations from Gemma-2-9B-Instruct.
-- **Probe and model rankings overlap only weakly.** Their top feature sets share roughly 11-14% of features, with Spearman rank correlation `rho = 0.10`.
-- **Shared features have the largest behavioral effect.** Ablating shared probe-model features flips the model's `True`/`False` output on as many as 27% of statements, compared with 6% for size-matched probe-only features and 1% for random controls.
-- **Probe-only features mainly move the probe.** They produce a larger shift in the probe's own readout while causing substantially fewer behavioral flips than shared features.
-- **The effect is coherent and robust.** Output coherence remains 100% in the headline ablations, and the shared > probe-only > random ordering holds across five seeds and a held-out split.
-- **Activation-aware selection outperforms geometric alignment.** A learned sparse mask flips behavior on `17.6 +/- 0.7%` of statements, nearly three times the geometric probe top-16 (`6.1 +/- 0.5%`), despite sharing only 3 of those 16 features.
-- **SAE substrate quality is a prerequisite.** In the paper's auxiliary obfuscation-probe analysis, only 26% of the raw probe margin survives SAE reconstruction. This is a boundary case: SAE-feature interventions should not be interpreted causally unless the SAE basis actually preserves the probe signal.
-
-## Method at a glance
-
-For a linear probe with weight vector `w` and an SAE decoder direction `d_i`, the probe-alignment score for feature `i` is:
-
-```text
-c_i = w^T d_i
-```
-
-The model-side score is the mean gradient sensitivity of the target-token margin to that feature's activation:
-
-```text
-A_i = E_x[d(logit(True) - logit(False)) / d f_i]
-```
-
-For a selected feature set `S`, the intervention subtracts its decoded contribution from the residual stream:
-
-```text
-h_intervened = h - sum_{i in S}(f_i d_i)
-```
-
-We then measure:
-
-- **Behavior flip rate:** whether the sign of the `True` minus `False` logit margin changes.
-- **Probe-readout shift:** how much the intervention moves the probe margin.
-- **Coherence:** whether the model still emits a valid `True` or `False` response.
+Probe-aligned SAE features overlap only ~12% with gradient-sensitive ones; ablating shared features flips behavior far more than probe-only or random sets, showing that probe weights alone do not identify causally relevant features.
 
 ## Repository contents
 
 | File | Purpose |
 |---|---|
-| [`TTPD_probe_experiments.ipynb`](TTPD_probe_experiments.ipynb) | Primary paper reproduction: TTPD replication, SAE probe/model attribution, overlap analysis, sparse-mask learning, feature ablations, robustness tests, coherence diagnostics, and appendix analyses. |
+| [`TTPD_probe_experiments.ipynb`](TTPD_probe_experiments.ipynb) | Primary analysis: TTPD replication, SAE probe/model attribution, overlap analysis, sparse-mask learning, feature ablations, robustness tests, coherence diagnostics, and appendix analyses. |
 | [`reward_hacking_experiments.ipynb`](reward_hacking_experiments.ipynb) | Companion probe/SAE-substrate diagnostic on a Gemma-3-12B reward-hacking probe. It measures how much of the published probe signal survives SAE reconstruction and compares raw-activation with reconstruction-space ablations. |
 
-The TTPD notebook corresponds to the paper's main Gemma-2/TTPD analysis. The reward-hacking notebook is a related diagnostic and should not be treated as a reproduction of the primary case study.
+The TTPD notebook contains the main Gemma-2/TTPD analysis. The reward-hacking notebook is a related diagnostic and should not be treated as a reproduction of the primary case study.
 
 ## Reproducing the main experiment
 
@@ -93,7 +39,7 @@ The notebook installs its Python dependencies and downloads the required public 
 
 ### Run instructions
 
-1. Open [`TTPD_probe_experiments.ipynb`](TTPD_probe_experiments.ipynb) in Colab using the badge above.
+1. Open [`TTPD_probe_experiments.ipynb`](TTPD_probe_experiments.ipynb) in Google Colab.
 2. Select a GPU runtime.
 3. Add `HF_TOKEN` under **Colab > Secrets** and enable notebook access to it.
 4. Run Sections 1-3 to clone the upstream repositories, install dependencies, patch current-library compatibility, and extract layer-20 activations for the 12 canonical factual-statement sets.
@@ -111,7 +57,7 @@ If that archive already exists, use the notebook's restore path instead of rerun
 
 ### Experiment map
 
-| Notebook section | Paper output |
+| Notebook section | Reproduced output |
 |---|---|
 | 7.1 | Probe-model overlap curve and Spearman correlation |
 | 7.2 | Shared, geometric, mask, and random ablations; Figure 2 and Table 3 |
@@ -145,28 +91,7 @@ The activation shards are not included in this repository.
 
 ## Reproducibility notes
 
-- The paper reports multi-seed means. Individual notebook runs resample statements and random controls, so exact values can vary slightly with the seed, hardware, and library versions.
+- Reported results use multi-seed means. Individual notebook runs resample statements and random controls, so exact values can vary slightly with the seed, hardware, and library versions.
 - The conclusions should be evaluated from the qualitative and statistical pattern, not a single point estimate: weak probe-model overlap, shared > probe-only > random behavioral effects, and the dissociation between behavior change and probe-readout change.
 - The notebooks clone upstream repositories at runtime. Future upstream changes may affect reproducibility; record commit hashes when producing archival results.
 - Coherence gating is essential. A behavioral flip is interpretable only when the intervention preserves a valid output and does not merely degrade generation.
-
-## Limitations
-
-The primary causal analysis studies one model, layer, SAE, probe, and factual-verification setting. The interventions establish behavioral relevance in this setting; they do not demonstrate a universal mechanism for deception. Generalization across model families, SAE architectures, layers, probe types, and broader behavioral domains remains open.
-
-## Citation
-
-If this repository is useful in your work, please cite:
-
-```bibtex
-@inproceedings{tiwari2026decodability,
-  title     = {Decodability is Not Causality: Validating Behavioral Probes with SAE Decomposition},
-  author    = {Tiwari, Devesh and Davis, Camille and Sinha, Shivank and Weaver, Talia and Shah, Aditya and Chaudhary, Maheep},
-  booktitle = {Conference on Language Modeling},
-  year      = {2026}
-}
-```
-
-## Acknowledgments
-
-This work builds on the TTPD truth probe from Buerger et al. (2024), the instructed truth/deception setting and released artifacts from Long et al. (2025), Gemma Scope SAEs, and the public deception probes released with [The Obfuscation Atlas](https://arxiv.org/abs/2602.15515).
