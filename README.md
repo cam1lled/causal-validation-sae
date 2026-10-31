@@ -5,7 +5,6 @@ Reproducibility code for **"Decodability is Not Causality: Validating Behavioral
 Accepted to the COLM 2026 AIMS Workshop, Actionable Interpretability Workshop, and Workshop on Agent Behavior.
 
 **Devesh Tiwari\*, Camille Davis\*, Shivank Sinha, Talia Weaver, Aditya Shah, and Maheep Chaudhary**<br>
-Algoverse AI Research<br>
 \*Equal contribution
 
 ## TL;DR
